@@ -1,22 +1,25 @@
+# Stock Analysis Project - Data Schema
+
+## Transaction Table
+
 | Column Name | Data Type |
 |---|---|
-transaction_id	 STRING,
-symbol 	 STRING,
-price 	FLOAT64,
-volume	 INT64,
-trade_value 	FLOAT64,
-trade_type 	STRING,
-trader_id	 STRING,
-exchange 	STRING,
-region 	STRING,
-timestamp 	TIMESTAMP
-ingestion_time 	TIMESTAMP,
-processing_latency_ms 	INT64,
-is_anomaly 	BOOLEAN,
-anomaly_reason	 STRING
+| transaction_id | STRING |
+| symbol | STRING |
+| price | FLOAT64 |
+| volume | INT64 |
+| trade_value | FLOAT64 |
+| trade_type | STRING |
+| trader_id | STRING |
+| exchange | STRING |
+| region | STRING |
+| timestamp | TIMESTAMP |
+| ingestion_time | TIMESTAMP |
+| processing_latency_ms | INT64 |
+| is_anomaly | BOOLEAN |
+| anomaly_reason | STRING |
 
-
-anamoly table:
+## Anomaly Table
 
 | Column Name | Data Type |
 |---|---|
