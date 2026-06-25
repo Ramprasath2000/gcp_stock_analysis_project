@@ -41,3 +41,31 @@ class CleanData(beam.DoFn_):
             logging.warning(f"Dropping record with non-positive price or volume")
             return
         yield record
+
+
+#Define a function to enrich data
+
+class EnrichData(beam.DoFn):
+	def process (self, record):
+		#Add trade value
+		record["trade_value"] = round(record["price"] * record["volume"], 2)
+		
+
+		#Add ingestion time
+		ingestion_time = datetime.now(timezone.utc).isoformat()
+		record["ingestion_time"] = ingestion_time
+
+		#Add processing latency
+		event_time = datetime.fromisoformat(record["timestamp"])
+		ingestion = datetime.fromisoformat(ingestion_time)
+		latency = ingestion - event_time
+		record["processing_latency_ms"] = int(latency.total_seconds() * 1000 )
+	
+
+		#aNAMOLY FIELDS - DEFAULT FOR NOW
+		record["is_anamoly"] = False
+		record["anomaly_reason"] = None
+
+		yield record
+		
+		
