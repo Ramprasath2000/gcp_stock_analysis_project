@@ -42,7 +42,6 @@ class CleanData(beam.DoFn_):
             return
         yield record
 
-
 #Define a function to enrich data
 
 class EnrichData(beam.DoFn):
@@ -68,4 +67,48 @@ class EnrichData(beam.DoFn):
 
 		yield record
 		
-		
+#Defining the BigQuery schema for the output table
+
+BQ__SCHEMA = {
+     "fields": [
+          {"name": "transaction_id", "type": "STRING"},
+          {"name": "symbol", "type": "STRING"},
+          {"name": "price", "type": "FLOAT"},
+          {"name": "volume", "type": "INTEGER"},
+          {"name": "trade_value", "type": "FLOAT"},
+          {"name": "trade_type", "type": "STRING"},
+          {"name": "trader_id", "type": "STRING"},
+          {"name": "exchange", "type": "STRING"},
+          {"name": "region", "type": "STRING"},
+          {"name": "timestamp", "type": "TIMESTAMP"},
+          {"name": "ingestion_time", "type": "TIMESTAMP"},
+          {"name": "processing_latency_ms", "type": "INTEGER"},
+          {"name": "is_anomaly", "type": "BOOLEAN"},
+          {"name": "anomaly_reason", "type": "STRING"}
+     ]
+}
+
+
+#Main pipeline function
+
+def run():
+     options = PipelineOptions()
+     options.view_as(StandardOptions).streaming = True
+
+     with beam.Pipeline(options = options) as p:
+          (
+               p
+               | "Read from PubSub" >> beam.io.ReadFromPubSub(subscription = SUBSCRIPTION)
+               | "Parse JSON" >> beam.ParDo(ParseMessage())
+               | "Clean Data" >> beam.ParDo(CleanData())
+               | "Enrich Data" >> beam.ParDo(EnrichData())
+               | "Write to BigQuery" >> WriteToBigQuery(
+                    BQ_TABLE,
+                    schema = BQ_SCHEMA,
+                    write_disposition = BigQueryDisposition.WRITE_APPEND,
+                    create_disposition = BigQueryDisposition.CREATE_IF_NEEDED
+               )
+          )
+
+          if __name__ == "__main__";
+               run()
